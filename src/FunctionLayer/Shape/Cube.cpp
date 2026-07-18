@@ -124,15 +124,20 @@ void Cube::fillIntersection(float distance, int primID, float u, float v,
 
   intersection->texCoord = Vector2f{u, v};
   // TODO 计算交点的切线和副切线
-  Vector3f tangent{1.f, 0.f, .0f};
-  Vector3f bitangent;
-  if (std::abs(dot(tangent, intersection->normal)) > .9f) {
-    tangent = Vector3f(.0f, 1.f, .0f);
-  }
-  bitangent = normalize(cross(tangent, intersection->normal));
-  tangent = normalize(cross(intersection->normal, bitangent));
-  intersection->tangent = tangent;
-  intersection->bitangent = bitangent;
+  int normalAxis = primID / 2;
+  int uAxis = (normalAxis + 1) % 3;
+  int vAxis = (normalAxis + 2) % 3;
+
+  Vector3f dpdu_local(.0f), dpdv_local(.0f);
+  dpdu_local[uAxis] = boxMax[uAxis] - boxMin[uAxis];
+  dpdv_local[vAxis] = boxMax[vAxis] - boxMin[vAxis];
+
+  Vector3f dpdu_world = transform.toWorld(dpdu_local);
+  Vector3f dpdv_world = transform.toWorld(dpdv_local);
+  intersection->dpdu = dpdu_world;
+  intersection->dpdv = dpdv_world;
+  intersection->tangent = normalize(dpdu_world);
+  intersection->bitangent = normalize(cross(intersection->tangent, intersection->normal));
 }
 
 REGISTER_CLASS(Cube, "cube")
