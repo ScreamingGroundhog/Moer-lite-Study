@@ -23,6 +23,10 @@ public:
   virtual BSDFSampleResult sample(const Vector3f &wo,
                                   const Vector2f &sample) const = 0;
 
+  //* 是否为delta(dirac)类型的BSDF(如镜面反射)
+  //* delta类型的BSDF无法通过NEE得到直接光照，需要特殊处理
+  virtual bool isSpecular() const { return false; }
+
 public:
   Vector3f normal, tangent, bitangent; // 构成局部坐标系
 protected:

@@ -1,6 +1,7 @@
 #include <CoreLayer/Math/Math.h>
 #include <FunctionLayer/Camera/Pinhole.h>
 #include <FunctionLayer/Integrator/Integrator.h>
+#include <FunctionLayer/NRC/NRC.h>
 #include <FunctionLayer/Sampler/Sampler.h>
 #include <FunctionLayer/Scene/Scene.h>
 #include <FunctionLayer/Texture/Mipmap.h>
@@ -32,8 +33,17 @@ int main(int argc, char** argv) {
     Json          json       = Json::parse(fstm);
     auto          camera     = Factory::construct_class<Camera>(json["camera"]);
     auto          scene      = std::make_shared<Scene>(json["scene"]);
-    auto          integrator = Factory::construct_class<Integrator>(json["integrator"]);
     auto          sampler    = Factory::construct_class<Sampler>(json["sampler"]);
+
+    //* Neural Radiance Cache流水线(大作业-离线渲染选题二)
+    //* 在scene.json中配置"nrc"字段后，将运行收集数据->训练网络->渲染的完整流程
+    if (json.contains("nrc")) {
+        auto nrc = Factory::construct_class<NRC>(json["nrc"]);
+        nrc->run(*scene, *camera, json);
+        return 0;
+    }
+
+    auto          integrator = Factory::construct_class<Integrator>(json["integrator"]);
     int           spp        = sampler->xSamples * sampler->ySamples;
     int           width = camera->film->size[0], height = camera->film->size[1];
 

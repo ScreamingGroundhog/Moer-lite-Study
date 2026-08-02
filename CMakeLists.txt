@@ -37,6 +37,11 @@ add_executable(Moer
   src/FunctionLayer/Integrator/NormalIntegrator.cpp
   src/FunctionLayer/Integrator/DirectIntegrator.cpp
   src/FunctionLayer/Integrator/WhittedIntegrator.cpp
+  src/FunctionLayer/Integrator/PathIntegrator.cpp
+
+  src/FunctionLayer/NRC/HashGrid.cpp
+  src/FunctionLayer/NRC/MLP.cpp
+  src/FunctionLayer/NRC/NRC.cpp
 
   src/FunctionLayer/Camera/Camera.cpp
   src/FunctionLayer/Camera/Pinhole.cpp
@@ -77,6 +82,12 @@ endif()
 if(UNIX AND NOT APPLE)
   set(LIBS_PATH ${PROJECT_SOURCE_DIR}/libs/linux)
   set(EMBREE_DLL ${LIBS_PATH}/libembree3.so.3 ${LIBS_PATH}/libtbb.so.12.2)
+endif()
+
+#* NRC神经辐射缓存使用OpenMP并行收集数据与训练
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(Moer PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
 if(APPLE)

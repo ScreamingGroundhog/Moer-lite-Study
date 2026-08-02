@@ -39,6 +39,15 @@ public:
   //* 向加速结构中增加一个几何体
   void attachShape(std::shared_ptr<Shape> shape) { shapes.emplace_back(shape); }
 
+  //* 所有几何体包围盒的并集
+  AABB getSceneBounds() const {
+    AABB bounds;
+    for (const auto &shape : shapes) {
+      bounds.Expand(shape->getAABB());
+    }
+    return bounds;
+  }
+
 public:
   static AccelerationType type;
 
